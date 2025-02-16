@@ -12,7 +12,7 @@ f_r4 = @(theta2) R3.*cosd(f_theta3(theta2)) + R2.*cosd(theta2);
 f_theta3dot = @(theta2) -1*R2*theta2_velocity*cosd(theta2)./(R3*cosd(f_theta3(theta2)));
 f_r4dot = @(theta2) -1*R3.*f_theta3dot(theta2).*sind(f_theta3(theta2)) - R2*theta2_velocity.*sind(theta2);
 f_theta3dotdot = @(theta2) (R3.*(f_theta3dot(theta2).^2).*sind(f_theta3(theta2)) + R2*theta2_velocity.*sind(theta2)) ./ (R3.*cosd(f_theta3(theta2)));
-f_r4dotdot = @(theta2) -1*R3.*(f_theta3dotdot(theta2).*sind(f_theta3(theta2)) + R3.*f_theta3dot(theta2).^2.*cosd(f_theta3(theta2))) + R2.*theta2_velocity.^2.*cos(f_theta3(theta2));
+f_r4dotdot = @(theta2) -1*R3.*(f_theta3dotdot(theta2).*sind(f_theta3(theta2)) + R3.*f_theta3dot(theta2).^2.*cosd(f_theta3(theta2))) + + R2.*theta2_velocity.^2.*cosd(theta2);
 
 
 f_theta6 = @(theta2) -1*asind(R2/R6*sind(f_theta3(theta2) - theta2)) - f_theta3(theta2);
