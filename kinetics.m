@@ -158,9 +158,6 @@ end  % end for loop over theta2
 % -------------------------------
 % 3) Make the plots
 % -------------------------------
-% -------------------------------
-% 3) Make the plots
-% -------------------------------
 
 figure('Name','Individual Force Magnitudes','NumberTitle','off');
 
