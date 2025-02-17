@@ -8,7 +8,7 @@ R6 = 60;
 theta2_velocity = 2;
 
 % Function for theta3 with respect to theta2
-f_theta3 = @(theta2) 180 - asind((R1 - R2.*sind(theta2))/R3);
+f_theta3 = @(theta2) asind((R1 - R2.*sind(theta2))/R3);
 
 % Function for length of link 4 with respect to theta2
 f_r4 = @(theta2) R3.*cosd(f_theta3(theta2)) + R2.*cosd(theta2);
@@ -23,7 +23,7 @@ f_r4dot = @(theta2) -1*R3.*f_theta3dot(theta2).*sind(f_theta3(theta2)) - R2*thet
 f_theta3dotdot = @(theta2) -1*(R3.*(f_theta3dot(theta2).^2).*sind(f_theta3(theta2)) + R2*theta2_velocity.*sind(theta2)) ./ (R3.*cosd(f_theta3(theta2)));
 
 % Function for length of link 4 acceleration with respect to theta2
-f_r4dotdot = @(theta2) -1*R3.*(f_theta3dotdot(theta2).*sind(f_theta3(theta2)) + R3.*(f_theta3(theta2).^2).*cosd(f_theta3(theta2))) + R2.*theta2_velocity.^2.*cosd(theta2);
+f_r4dotdot = @(theta2) -1*R3.*(f_theta3dotdot(theta2).*sind(f_theta3(theta2)) + (f_theta3(theta2).^2).*cosd(f_theta3(theta2))); + (R2.*(theta2_velocity.^2)).*cosd(theta2);
 
 % Function for theta6 with respect to theta2
 f_theta6 = @(theta2) -1*asind(R2/R6*sind(f_theta3(theta2) - theta2)) - f_theta3(theta2);
