@@ -1,4 +1,4 @@
-function A = get_A_matrix(theta_i, R2, R3, R3A, R6) 
+function A = get_A_matrix_Skeleton(theta_i, R2, R3, R3A, R6) 
     A = zeros(13, 13); % Initialize a 13x13 matrix of zeros
     
     % --- LINK 2: Force Equilibrium Equations ---
@@ -11,7 +11,7 @@ function A = get_A_matrix(theta_i, R2, R3, R3A, R6)
     A(2,6) =  1;  % F_3y coefficient
     
     % Row 3: ∑M_A for Link 2  =>  M_12 - F_3x R2 sin(theta2) + F_3y R2 cos(theta2) = 0
-    A(3,3) =  13;  % M_12 coefficient
+    A(3,13) =  1;  % M_12 coefficient
     A(3,5) = -R2 * sin(theta_i(2));  % -F_3x * R2 * sin(theta2)
     A(3,6) =  R2 * cos(theta_i(2));  % F_3y * R2 * cos(theta2)
     
@@ -39,9 +39,9 @@ function A = get_A_matrix(theta_i, R2, R3, R3A, R6)
     % Row 7: ∑F_x for Link 4  =>  -F_4x = RHS (m_4 * ddR4)
     A(7,7) = -1;  % -F_4x coefficient
 
-    % Row 8: ∑F_y for Link 4  =>  -F_4y  + F14y = 0
+    % Row 8: ∑F_y for Link 4  =>  -F_4y  + F_14y = 0
     A(8,8) = -1;  % -F_4y coefficient
-    A(8,12) = 1;
+    A(8,12) = 1; %F_14y coefficient
     
     % --- LINK 5: Force Equilibrium Equations (Point Mass) ---
     
@@ -56,12 +56,12 @@ function A = get_A_matrix(theta_i, R2, R3, R3A, R6)
     % --- LINK 6: Force & Moment Equilibrium Equations ---
     
     % Row 11: ∑F_x for Link 6  =>  F_6x - F_1x = RHS
-    A(11,10) =  1;  % F_6x coefficient
-    A(11,1)  = -1;  % -F_1x coefficient
+    A(11,10) = -1;  % -F_6x coefficient
+    A(11,1)  = 1;  % F_1x coefficient
 
     % Row 12: ∑F_y for Link 6  =>  F_6y - F_1y = RHS
-    A(12,11) =  1;  % F_6y coefficient
-    A(12,2)  = -1;  % -F_1y coefficient
+    A(12,11) = -1;  % -F_6y coefficient
+    A(12,2)  = 1;  % F_1y coefficient
 
     % Row 13: ∑M_A for Link 6  =>  F_6x * R6 * sin(theta2) - F_6y * R6 * cos(theta2) = M_6
     A(13,10) =  R6 * sin(theta_i(2));  % F_6x * R6 * sin(theta2)

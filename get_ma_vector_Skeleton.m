@@ -1,14 +1,11 @@
-function ma = get_ma_vector( theta_i, dtheta_i, ddtheta_i, ...
+function ma = get_ma_vector_Skeleton( theta_i, dtheta_i, ddtheta_i, ...
                              r_i, ddr_i)
     % get_ma_vector: Returns the inertia (mass-acceleration) vector
     % for the links in the mechanism.
-    %
-    % The vector ma is typically used as the B vector in A x = B.
-    % Here we show an example of how to handle Link 2 and Link 3.
-
+    
     %% --- LINK 2 PARAMETERS ---
     R2      = r_i(2);        % reference length for link 2
-    th2     = theta_i(2);    % angle of link 2 (in radians if using cos/sin)
+    th2     = theta_i(2);    % angle of link 2
     w2      = dtheta_i(2);   % angular velocity
 
     m2 = 2700 * pi * R2;
@@ -33,7 +30,7 @@ function ma = get_ma_vector( theta_i, dtheta_i, ddtheta_i, ...
     % Mass of Link 3
     m3 = 2700 * pi * R3;
     
-    I3 = m3 * (25 + (1/12) * R3^2);   % moment of inertia of link 3 about its center of mass
+    I3 = m3 * (25*1e-6 + (1/12) * R3^2);   % moment of inertia of link 3 about its center of mass
 
     % Acceleration of link 3's center of mass
     a_G3x = - R2 * (w2^2) * cos(th2) + 0.5 * R3 * (-alpha3 * sin(th3) - w3^2 * cos(th3));
@@ -43,7 +40,7 @@ function ma = get_ma_vector( theta_i, dtheta_i, ddtheta_i, ...
     %% Inertial “forces” and moment for Link 3
     Fx_link3 = m3 * a_G3x;
     Fy_link3 = m3 * a_G3y;
-    M_link3  = I3 * alpha3;  % about the link’s CG
+    M_link3  = I3 * alpha3;
 
     %% --- LINK 4 PARAMETERS (Point Mass) ---
     ddR4    = ddr_i(4);  % Linear acceleration of Link 4
@@ -56,7 +53,7 @@ function ma = get_ma_vector( theta_i, dtheta_i, ddtheta_i, ...
     Fy_link4 = 0;           % No acceleration in y-direction
 
     %% --- LINK 5 PARAMETERS (Point Mass) ---
-    R6      = r_i(6);  % Reference length R6
+    R6      = r_i(6);
     th6     = theta_i(6);    
     w6      = dtheta_i(6);   
     alpha6  = ddtheta_i(6);  
@@ -82,7 +79,7 @@ function ma = get_ma_vector( theta_i, dtheta_i, ddtheta_i, ...
     m6 = 2700 * pi * R6;
     
     % Moment of inertia of Link 6 about its center of mass
-    I6 = m6 * (25 + (1/12) * R6^2);
+    I6 = m6 * (25*1e-6 + (1/12) * R6^2);
 
     % Acceleration of link 6's center of mass
     a_G6x = -alpha6 * sin(th6) - 0.5 * R6 * (w6^2) * cos(th6);
