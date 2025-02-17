@@ -3,37 +3,60 @@
 clear; clc; close all;
 
 %% Kinematics
-%Code for Angles
-R1 = 8.4; 
-R2 = 36;
+% Declare constants for link lengths, range for theta2, and theta2 angular velocity
+theta2 = linspace(0, 400, 100);
+R1 = 8.4;  % Example known value
+R2 = 36;  % Example known value
 R3 = 120;
 R6 = 60;
 theta2_velocity = 2;
 
+% Function for theta3 with respect to theta2
 f_theta3 = @(theta2) asind((R1 - R2.*sind(theta2))/R3);
+
+% Function for length of link 4 with respect to theta2
 f_r4 = @(theta2) R3.*cosd(f_theta3(theta2)) + R2.*cosd(theta2);
-f_theta3dot = @(theta2) -1*R2*theta2_velocity*cosd(theta2)./(R3*cosd(f_theta3(theta2)));
+
+% Function for theta3 velocity with respect to theta2
+f_theta3dot = @(theta2) R2*theta2_velocity*cosd(theta2)./(R3*cosd(f_theta3(theta2)));
+
+% Function for length of link 4 velocity with respect to theta2
 f_r4dot = @(theta2) -1*R3.*f_theta3dot(theta2).*sind(f_theta3(theta2)) - R2*theta2_velocity.*sind(theta2);
-f_theta3dotdot = @(theta2) (R3.*(f_theta3dot(theta2).^2).*sind(f_theta3(theta2)) + R2*theta2_velocity.*sind(theta2)) ./ (R3.*cosd(f_theta3(theta2)));
-f_r4dotdot = @(theta2) -1*R3.*(f_theta3dotdot(theta2).*sind(f_theta3(theta2)) + R3.*f_theta3dot(theta2).^2.*cosd(f_theta3(theta2))) + + R2.*theta2_velocity.^2.*cosd(theta2);
 
+% Function for theta3 acceleration with respect to theta2
+f_theta3dotdot = @(theta2) -1*(R3.*(f_theta3dot(theta2).^2).*sind(f_theta3(theta2)) + R2*theta2_velocity.*sind(theta2)) ./ (R3.*cosd(f_theta3(theta2)));
 
-f_theta6 = @(theta2) -1*asind(R2/R6*sind(f_theta3(theta2) - theta2)) - f_theta3(theta2);
+% Function for length of link 4 acceleration with respect to theta2
+f_r4dotdot = @(theta2) -1*R3.*(f_theta3dotdot(theta2).*sind(f_theta3(theta2)) + (f_theta3dot(theta2).^2).*cosd(f_theta3(theta2))) - (R2.*(theta2_velocity.^2)).*cosd(theta2);
+
+% Function for theta6 with respect to theta2
+f_theta6 = @(theta2) -1*asind(R2/R6.*sind(f_theta3(theta2) - theta2)) - f_theta3(theta2);
+
+% Function for length of link 3A with respect to theta2
 f_3A = @(theta2) (R6.*cosd(f_theta6(theta2)) - R2.*cosd(theta2))./cosd(f_theta3(theta2));
+
+% Function for velocity of length of link 3A with respect to theta2
 f_3Adot = @(theta2) (f_3A(theta2).*f_theta3dot(theta2).*(sind(f_theta3(theta2)).*cosd(f_theta6(theta2)) - cosd(f_theta3(theta2)).*sind(f_theta6(theta2))) ...
             + R2*theta2_velocity.*(sind(theta2).*cosd(f_theta6(theta2)) - cosd(theta2).*sind(f_theta6(theta2)))) ...
             ./ (cosd(f_theta3(theta2)).*cosd(f_theta6(theta2)) + sind(f_theta3(theta2)).*sind(f_theta6(theta2)));
 
+% Function for velocity of theta6 with respect to theta2
 f_theta6dot = @(theta2) (f_3Adot(theta2).*cosd(f_theta3(theta2)) - f_3A(theta2).*f_theta3dot(theta2).*sind(f_theta3(theta2)) - R2*theta2_velocity.*sind(theta2)) ./ (-R6.*sind(f_theta6(theta2)));
 
-
+% Helper function 1
 f_ky = @(theta2) (-1*R6.*(f_theta6dot(theta2).^2).*sind(f_theta6(theta2)) - 2.*f_3Adot(theta2).*f_theta3dot(theta2).*cosd(f_theta3(theta2)) - f_3A(theta2).*f_theta3dotdot(theta2).*cosd(f_theta3(theta2)) + f_3A(theta2).*(f_theta3dot(theta2).^2).*sind(f_theta3(theta2)) + R2.*(theta2_velocity^2).*sind(theta2));
+
+% Helper function 2
 f_kx = @(theta2) -1*R6.*(f_theta6dot(theta2).^2).*cosd(f_theta6(theta2)) + 2.*f_3Adot(theta2).*f_theta3dot(theta2).*sind(f_theta3(theta2)) + f_3A(theta2).*f_theta3dotdot(theta2).*sind(f_theta3(theta2)) + f_3A(theta2).*(f_theta3dot(theta2).^2).*cosd(f_theta3(theta2)) + R2.*(theta2_velocity^2).*cosd(theta2);
 
+% Function for acceleration of link 3A with respect to theta2
+f_3Adotdot = @(theta2) (- (f_3A(theta2).*sind(f_theta3(theta2)) - f_ky(theta2)).*sind(f_theta6(theta2)) + f_kx(theta2)) ./ (cosd(f_theta3(theta2)).*cosd(f_theta6(theta2)));
 
-f_3Adotdot = @(theta2) -1.*(f_3A(theta2).*sind(f_theta3(theta2)) - f_ky(theta2)).*sind(f_theta6(theta2)./(cosd(f_theta6(theta2)).*cosd(f_theta3(theta2))) + f_kx(theta2)./cosd(f_theta3(theta2)));
-
+% Function for acceleration of theta6 with respect to theta2
 f_theta6dotdot = @(theta2) (f_3Adotdot(theta2).*sind(f_theta3(theta2)) - f_ky(theta2)) ./ (R6.*cosd(f_theta6(theta2)));
+
+f_corlias_acceleration = @(theta2) -2.*f_theta3dot(theta2).*f_3Adot(theta2);
+
 
 
 %% Part 2 - Force and Moment Calculation
