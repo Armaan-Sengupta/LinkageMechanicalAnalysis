@@ -26,7 +26,7 @@ f_theta3dotdot = @(theta2) -1*(R3.*(f_theta3dot(theta2).^2).*sind(f_theta3(theta
 f_r4dotdot = @(theta2) -1*R3.*(f_theta3dotdot(theta2).*sind(f_theta3(theta2)) + (f_theta3(theta2).^2).*cosd(f_theta3(theta2))); + (R2.*(theta2_velocity.^2)).*cosd(theta2);
 
 % Function for theta6 with respect to theta2
-f_theta6 = @(theta2) -1*asind(R2/R6*sind(f_theta3(theta2) - theta2)) - f_theta3(theta2);
+f_theta6 = @(theta2) -1*asind(R2/R6.*sind(f_theta3(theta2) - theta2)) - f_theta3(theta2);
 
 % Function for length of link 3A with respect to theta2
 f_3A = @(theta2) (R6.*cosd(f_theta6(theta2)) - R2.*cosd(theta2))./cosd(f_theta3(theta2));
