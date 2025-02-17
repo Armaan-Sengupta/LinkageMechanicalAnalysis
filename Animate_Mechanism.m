@@ -1,19 +1,19 @@
 clear; clc; close all;
 
-%% -- Known --
-R1 = 8.4;   % Slider track height for D
-R2 = 36;    % Length of link AB
-R3 = 120;   % Length of slider link BD
-R6 = 60;    % Length of coupler AC
-theta2_velocity = 2;  
+%% -- Kinematic Equations --
+theta2 = linspace(0, 400, 100);
+R1 = 8.4;  % Example known value
+R2 = 36;   % Example known value
+R3 = 120;
+R6 = 60;
+theta2_velocity = 2;
 
-%% -- Kinematic function handles --
 f_theta3 = @(theta2) asind((R1 - R2.*sind(theta2))/R3);
 f_r4 = @(theta2) R3.*cosd(f_theta3(theta2)) + R2.*cosd(theta2);
 f_theta3dot = @(theta2) -1*R2*theta2_velocity*cosd(theta2)./(R3*cosd(f_theta3(theta2)));
 f_r4dot = @(theta2) -1*R3.*f_theta3dot(theta2).*sind(f_theta3(theta2)) - R2*theta2_velocity.*sind(theta2);
 f_theta3dotdot = @(theta2) (R3.*(f_theta3dot(theta2).^2).*sind(f_theta3(theta2)) + R2*theta2_velocity.*sind(theta2)) ./ (R3.*cosd(f_theta3(theta2)));
-f_r4dotdot = @(theta2) -1*R3.*(f_theta3dotdot(theta2).*sind(f_theta3(theta2)) + R3.*f_theta3dot(theta2).^2.*cosd(f_theta3(theta2))) + R2.*theta2_velocity.^2.*cosd(theta2);
+f_r4dotdot = @(theta2) -1*R3.*(f_theta3dotdot(theta2).*sind(f_theta3(theta2)) + R3.*f_theta3dot(theta2).^2.*cosd(f_theta3(theta2))) + + R2.*theta2_velocity.^2.*cosd(theta2);
 
 f_theta6 = @(theta2) -1*asind(R2/R6*sind(f_theta3(theta2) - theta2)) - f_theta3(theta2);
 f_3A = @(theta2) (R6.*cosd(f_theta6(theta2)) - R2.*cosd(theta2))./cosd(f_theta3(theta2));
@@ -26,7 +26,10 @@ f_theta6dot = @(theta2) (f_3Adot(theta2).*cosd(f_theta3(theta2)) - f_3A(theta2).
 f_ky = @(theta2) (-1*R6.*(f_theta6dot(theta2).^2).*sind(f_theta6(theta2)) - 2.*f_3Adot(theta2).*f_theta3dot(theta2).*cosd(f_theta3(theta2)) - f_3A(theta2).*f_theta3dotdot(theta2).*cosd(f_theta3(theta2)) + f_3A(theta2).*(f_theta3dot(theta2).^2).*sind(f_theta3(theta2)) + R2.*(theta2_velocity^2).*sind(theta2));
 f_kx = @(theta2) -1*R6.*(f_theta6dot(theta2).^2).*cosd(f_theta6(theta2)) + 2.*f_3Adot(theta2).*f_theta3dot(theta2).*sind(f_theta3(theta2)) + f_3A(theta2).*f_theta3dotdot(theta2).*sind(f_theta3(theta2)) + f_3A(theta2).*(f_theta3dot(theta2).^2).*cosd(f_theta3(theta2)) + R2.*(theta2_velocity^2).*cosd(theta2);
 
+%f_kx = @(theta2) -1*R6;
+
 f_3Adotdot = @(theta2) -1.*(f_3A(theta2).*sind(f_theta3(theta2)) - f_ky(theta2)).*sind(f_theta6(theta2)./(cosd(f_theta6(theta2)).*cosd(f_theta3(theta2))) + f_kx(theta2)./cosd(f_theta3(theta2)));
+
 f_theta6dotdot = @(theta2) (f_3Adotdot(theta2).*sind(f_theta3(theta2)) - f_ky(theta2)) ./ (R6.*cosd(f_theta6(theta2)));
 
 %% -- Set up figure --
@@ -36,7 +39,7 @@ movegui(gcf, 'center');  % Center the figure on the screen
 hold on; grid on; axis equal;
 xlabel('X (cm)'); ylabel('Y (cm)');
 title('Animation: 3 Links (AB, BD, AC)');
-axis([-50 150 -10 50]);
+axis([-50 150 -50 50]);
 
 % Ground pivot A at (0,0)
 A = [0, 0];
@@ -55,16 +58,17 @@ for k = 1:length(theta2_range)
     % 2) Point D on the horizontal slider (y = R1)
     D = [f_r4(t2), R1];
     
-    % 3) Determine point C on BD using f_3A equation.
-    %    f_3A(t2) returns the distance from B to C along BD.
-    BDvec = D - B;       % Vector from B to D
-    frac = f_3A(t2) / R3;  % Fraction along BD (R3 is the full length)
-    C = B + frac * BDvec;
-    
+    % 3) Determine point C on BD such that AC = R6.
+    % Trying to find a location on BD where C lands, first by getting a
+    % unit vector along BD
+    v = D - B;
+    u = v / norm(v);           % Unit vector along BD.
+    beta = dot(B, u);
+    disc = beta^2 - (norm(B)^2 - R6^2);
+    alpha = -beta + sqrt(disc);  % Choose the positive root.
+    C = B + alpha * u;
+
     % 4) Plot the three links:
-    %    - Link AB (from A to B)
-    %    - Link BD (from B to D)
-    %    - Link AC (from A to C)
     hAB = plot([A(1), B(1)], [A(2), B(2)], 'ro-', 'LineWidth', 2);
     hBD = plot([B(1), D(1)], [B(2), D(2)], 'ko-', 'LineWidth', 2);
     hAC = plot([A(1), C(1)], [A(2), C(2)], 'co-', 'LineWidth', 2);
