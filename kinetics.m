@@ -91,7 +91,7 @@ Ms_list  = zeros(numPoints,1);
 
 for theta2 = 1:numPoints
     theta2deg=theta2_vals(theta2)
-    theta2rad=deg2rad(theta2);
+    theta2rad=deg2rad(theta2deg);
 
     % kinematic variables are caculated based on loop eqn
     r_i = [0,0.36,1.2,0,0,0.6];
