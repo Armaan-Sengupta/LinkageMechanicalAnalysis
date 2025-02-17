@@ -2,7 +2,6 @@
 
 clear; clc; close all;
 
-%% Kinematics
 % Declare constants for link lengths, range for theta2, and theta2 angular velocity
 theta2 = linspace(0, 400, 100);
 R1 = 8.4;  % Example known value
@@ -91,7 +90,7 @@ Ms_list  = zeros(numPoints,1);
 
 for theta2 = 1:numPoints
     theta2deg=theta2_vals(theta2)
-    theta2rad=deg2rad(theta2deg);
+    theta2rad=deg2rad(theta2);
 
     % kinematic variables are caculated based on loop eqn
     r_i = [0,0.36,1.2,0,0,0.6];
@@ -159,7 +158,10 @@ end  % end for loop over theta2
 % -------------------------------
 % 3) Make the plots
 % -------------------------------
-%% Plot
+% -------------------------------
+% 3) Make the plots
+% -------------------------------
+
 figure('Name','Individual Force Magnitudes','NumberTitle','off');
 
 subplot(4,2,1)
@@ -217,3 +219,21 @@ title('Shaking Force |F_s|');
 xlabel('\theta_2 [deg]');
 ylabel('Force [N]');
 grid on;
+
+figure('Name','Moment Plots','NumberTitle','off');
+
+
+subplot(2,1,1)
+plot(theta2_vals, M12_list, 'LineWidth',1.5);
+title('Moment M_{12} vs \theta_2');
+xlabel('\theta_2 [deg]');
+ylabel('M_{12} [N-m]');
+grid on;
+
+subplot(2,1,2)
+plot(theta2_vals, Ms_list, 'LineWidth',1.5);
+title('Shaking Moment M_s vs \theta_2');
+xlabel('\theta_2 [deg]');
+ylabel('M_s [N-m]');
+grid on;
+
